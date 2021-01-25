@@ -7,13 +7,15 @@ interface GameProps {
 }
 
 class Game implements GameProps {
-    width: number
-    height: number
+    private pTimestamp: number = 0;
+    private canvas: HTMLCanvasElement
+    private readonly context: CanvasRenderingContext2D
+
+    private _width: number
+    private _height: number
+
     background: string
     stage: Group = new Group()
-
-    private canvas: HTMLCanvasElement
-    private context: CanvasRenderingContext2D
 
     constructor(canvas: HTMLCanvasElement, props: GameProps) {
         this.canvas = canvas
@@ -29,25 +31,49 @@ class Game implements GameProps {
     }
 
     clearCanvas () {
-        this.context.clearRect(0, 0, this.width, this.height)
+        this.context.clearRect(0, 0, this._width, this._height)
     }
 
     drawBackground() {
-        this.context.beginPath()
-        this.context.rect(0, 0, this.width, this.height)
-        this.context.fillStyle = this.background
-        this.context.fill()
-
+        const { context } = this
+        context.beginPath()
+        context.rect(0, 0, this.width, this.height)
+        context.fillStyle = this.background
+        context.fill()
     }
 
     render (timestamp) {
-        // console.log(timestamp)
         requestAnimationFrame(timestamp => this.render(timestamp))
+        const deltaTime = timestamp - this.pTimestamp
+        this.pTimestamp = timestamp
+
+        this.stage.update(deltaTime)
+
         this.clearCanvas()
         this.drawBackground()
 
         this.stage.draw(this.context)
     }
+
+
+    get width(): number {
+        return this._width
+    }
+
+    set width(value: number) {
+        this._width = value;
+        this.canvas.width = value;
+    }
+
+    get height(): number {
+        return this._height
+    }
+
+    set height(value: number) {
+        this._height = value;
+        this.canvas.height = value
+    }
+
 
 }
 

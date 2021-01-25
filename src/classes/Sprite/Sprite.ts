@@ -1,38 +1,57 @@
 import DisplayObject, { DisplayObjectProps } from "@/classes/DisplayObject";
 
-interface SpriteProps extends DisplayObjectProps {
+export interface SpriteProps extends DisplayObjectProps {
     image: HTMLImageElement,
     frame: any,
-    context: CanvasRenderingContext2D
+    debug?: boolean
 }
 
 class Sprite extends DisplayObject implements SpriteProps {
 
+    debug: boolean
     image: HTMLImageElement
     frame: any
-    context: CanvasRenderingContext2D
+
 
     constructor(props: SpriteProps) {
         super(props);
 
         this.image = props.image ?? null
         this.frame = props.frame ?? null
-        this.context = props.context
+        this.debug = props.debug ?? false
     }
 
-    draw() {
-        const { x, y, width, height } = this;
-        this.context.drawImage(
+    draw(context) {
+        const { x, y, width, height, debug } = this;
+        context.drawImage(
             this.image,
-            this.frame.x,
-            this.frame.y,
-            this.frame.width,
-            this.frame.height,
+            this.frame?.x ?? 0,
+            this.frame?.y ?? 0,
+            this.frame?.width ?? 16,
+            this.frame?.height ?? 16,
             x,
             y,
             width,
             height
         )
+
+        if(debug){
+            context.beginPath()
+            context.rect(x, y, width, height)
+            context.fillStyle = 'rgba(0,0,0, 0.3)'
+            context.fill()
+
+            context.beginPath()
+            context.rect(x, y, width, height)
+            context.strokeStyle = 'red'
+            context.lineWidth = 3
+            context.stroke()
+
+            context.beginPath()
+            context.moveTo(x, y)
+            context.lineTo(x + width, y + height)
+            context.stroke()
+        }
 
     }
 }

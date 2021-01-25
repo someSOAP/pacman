@@ -23,6 +23,10 @@ class DisplayObject implements DisplayObjectProps {
         this.height = props.height ?? 0
     }
 
+    update(deltaTime: number) {
+
+    }
+
 }
 
 export default DisplayObject
