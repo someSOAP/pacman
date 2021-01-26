@@ -3,7 +3,8 @@ import DisplayObject, { DisplayObjectProps } from "@/classes/DisplayObject";
 export interface SpriteProps extends DisplayObjectProps {
     image: HTMLImageElement,
     frame: any,
-    debug?: boolean
+    speedX?: number,
+    speedY?: number,
 }
 
 class Sprite extends DisplayObject implements SpriteProps {
@@ -11,6 +12,8 @@ class Sprite extends DisplayObject implements SpriteProps {
     debug: boolean
     image: HTMLImageElement
     frame: any
+    speedX: number
+    speedY: number
 
 
     constructor(props: SpriteProps) {
@@ -19,10 +22,17 @@ class Sprite extends DisplayObject implements SpriteProps {
         this.image = props.image ?? null
         this.frame = props.frame ?? null
         this.debug = props.debug ?? false
+        this.speedX = props.speedX ?? 0
+        this.speedY = props.speedY ?? 0
     }
 
-    draw(context) {
-        const { x, y, width, height, debug } = this;
+    update(deltaTime: number) {
+        this.x += this.speedX
+        this.y += this.speedY
+    }
+
+    draw(context: CanvasRenderingContext2D) {
+        const { x, y, width, height } = this;
         context.drawImage(
             this.image,
             this.frame?.x ?? 0,
@@ -34,25 +44,7 @@ class Sprite extends DisplayObject implements SpriteProps {
             width,
             height
         )
-
-        if(debug){
-            context.beginPath()
-            context.rect(x, y, width, height)
-            context.fillStyle = 'rgba(0,0,0, 0.3)'
-            context.fill()
-
-            context.beginPath()
-            context.rect(x, y, width, height)
-            context.strokeStyle = 'red'
-            context.lineWidth = 3
-            context.stroke()
-
-            context.beginPath()
-            context.moveTo(x, y)
-            context.lineTo(x + width, y + height)
-            context.stroke()
-        }
-
+        super.draw(context)
     }
 }
 

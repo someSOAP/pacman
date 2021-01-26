@@ -30,6 +30,7 @@ class Cinematic extends Sprite implements CinematicProps {
     }
 
     update(deltaTime: number) {
+        super.update(deltaTime)
         this.timer += deltaTime
 
         if(this.timer >= this.cooldown) {

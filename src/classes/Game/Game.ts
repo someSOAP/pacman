@@ -34,6 +34,10 @@ class Game implements GameProps {
         this.context.clearRect(0, 0, this._width, this._height)
     }
 
+    update() {
+
+    }
+
     drawBackground() {
         const { context } = this
         context.beginPath()
@@ -47,6 +51,7 @@ class Game implements GameProps {
         const deltaTime = timestamp - this.pTimestamp
         this.pTimestamp = timestamp
 
+        this.update();
         this.stage.update(deltaTime)
 
         this.clearCanvas()

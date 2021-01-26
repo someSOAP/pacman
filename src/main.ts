@@ -2,9 +2,10 @@ import Game from "@/classes/Game";
 import { loadImage, loadJSON } from "@/utils/loader";
 import Sprite from "@/classes/Sprite";
 import Cinematic from "@/classes/Cinematic";
+import DisplayObject from "@/classes/DisplayObject";
 
 async function main (canvas: HTMLCanvasElement) {
-    const debug = false
+    const debug = true
     const scale = 3
 
     const [image, atlas] = await Promise.all([
@@ -21,6 +22,8 @@ async function main (canvas: HTMLCanvasElement) {
         animations: atlas.pacman,
         visible: true,
         frame: null,
+        speedX: 1,
+        speedY: 1,
         debug,
     })
     pacman.start("left")
@@ -56,16 +59,17 @@ async function main (canvas: HTMLCanvasElement) {
         })
 
 
-    const game = new Game(
-        canvas,
-        {
-            background: 'black',
-            height: 500,
-            width: 500
-        }
-    );
+    const walls = atlas.maze.walls.map(wall => new DisplayObject({
+        visible: true,
+        width: wall.width * scale,
+        height: wall.height * scale,
+        x: wall.x * scale,
+        y: wall.y * scale,
+        debug
+    }))
+    console.log(walls)
 
-    const foods = atlas.maze.foods.map(food => {
+    let foods = atlas.maze.foods.map(food => {
         return new Sprite({
             image,
             visible: true,
@@ -78,9 +82,54 @@ async function main (canvas: HTMLCanvasElement) {
         })
     })
 
+    const game = new Game(
+        canvas,
+        {
+            background: 'black',
+            height: 500,
+            width: 500
+        }
+    );
+
+    game.update = () => {
+        const eaten: Sprite[] = [];
+        for(const food of foods) {
+            if(pacman.hasCollision(food)){
+                eaten.push(food)
+
+            }
+        }
+        game.stage.remove(...eaten)
+        foods = foods.filter(food => !eaten.includes(food))
+    }
     game.width = maze.width
     game.height = maze.height
-    game.stage.add(maze, pacman, ...foods, ...ghosts)
+    game.stage.add(maze, pacman, ...foods, ...ghosts, ...walls)
+
+    document.addEventListener('keydown', event => {
+        switch (event.key) {
+            case "ArrowLeft":
+                pacman.start("left")
+                pacman.speedX = -1
+                pacman.speedY = 0
+                break
+            case "ArrowRight":
+                pacman.start("right")
+                pacman.speedX = 1
+                pacman.speedY = 0
+                break
+            case "ArrowUp":
+                pacman.start("up")
+                pacman.speedX = 0
+                pacman.speedY = -1
+                break
+            case "ArrowDown":
+                pacman.start("down")
+                pacman.speedX = 0
+                pacman.speedY = 1
+                break
+        }
+    })
 
 }
 
