@@ -8,7 +8,7 @@ import getRandomFrom from "@/utils/getRandomFrom";
 async function main (canvas: HTMLCanvasElement) {
     const debug: boolean = false
     const scale: number = 3
-    const spritesWidthHeight: number = 14;
+    const spritesWidthHeight: number = 13;
 
     const [image, atlas] = await Promise.all([
         loadImage('/src/sets/spritesheet.png'),
@@ -101,7 +101,6 @@ async function main (canvas: HTMLCanvasElement) {
         for(const food of foods) {
             if(pacman.hasCollision(food)){
                 eaten.push(food)
-
             }
         }
         game.stage.remove(...eaten)
@@ -140,11 +139,12 @@ async function main (canvas: HTMLCanvasElement) {
                 }
             }
 
-            if(pacman.hasCollision(ghost)){
+            if(ghost.hasCollision(pacman)){
                 pacman.speedY = 0
                 pacman.speedX = 0
+                pacman.nextDirection = undefined;
                 pacman.start('die', function (){
-                    // game.stage.remove(this)
+                    game.stage.remove(this)
                 })
             }
         }
