@@ -1,3 +1,3 @@
 import Sprite from "./Sprite";
-export { SpriteProps } from './Sprite'
+export { SpriteProps, SpriteDirections } from './Sprite'
 export default Sprite

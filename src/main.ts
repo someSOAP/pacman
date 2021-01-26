@@ -5,8 +5,9 @@ import Cinematic from "@/classes/Cinematic";
 import DisplayObject from "@/classes/DisplayObject";
 
 async function main (canvas: HTMLCanvasElement) {
-    const debug = true
-    const scale = 3
+    const debug: boolean = false
+    const scale: number = 3
+    const spritesWidthHeight: number = 14;
 
     const [image, atlas] = await Promise.all([
         loadImage('/src/sets/spritesheet.png'),
@@ -17,8 +18,8 @@ async function main (canvas: HTMLCanvasElement) {
         image,
         x: atlas.position.pacman.x * scale,
         y: atlas.position.pacman.y * scale,
-        width: 13 * scale,
-        height: 13 * scale,
+        width: spritesWidthHeight * scale,
+        height: spritesWidthHeight * scale,
         animations: atlas.pacman,
         visible: true,
         frame: null,
@@ -47,13 +48,16 @@ async function main (canvas: HTMLCanvasElement) {
                 y: atlas.position[color].y * scale,
                 animations: atlas[`${color}Ghost`],
                 visible: true,
-                width: 13 * scale,
-                height: 13 * scale,
+                width: spritesWidthHeight * scale,
+                height: spritesWidthHeight * scale,
                 frame: null,
                 debug,
             })
 
-            ghost.start(atlas.position[color].direction)
+            const ghostNextDirection = atlas.position[color].direction;
+
+            ghost.start(ghostNextDirection)
+            ghost.nextDirection = ghostNextDirection
 
             return ghost;
         })
@@ -101,6 +105,17 @@ async function main (canvas: HTMLCanvasElement) {
         }
         game.stage.remove(...eaten)
         foods = foods.filter(food => !eaten.includes(food))
+
+        changeDirection(pacman)
+        // ghosts.forEach(changeDirection)
+
+        const collidedWall = getWallCollision(pacman.getNextPosition());
+        if(collidedWall){
+            console.log(collidedWall)
+            pacman.speedX = 0
+            pacman.speedY = 0
+            pacman.start(`wait${pacman.animation.name}`)
+        }
     }
     game.width = maze.width
     game.height = maze.height
@@ -109,28 +124,68 @@ async function main (canvas: HTMLCanvasElement) {
     document.addEventListener('keydown', event => {
         switch (event.key) {
             case "ArrowLeft":
-                pacman.start("left")
-                pacman.speedX = -1
-                pacman.speedY = 0
+                pacman.nextDirection = 'left'
                 break
             case "ArrowRight":
-                pacman.start("right")
-                pacman.speedX = 1
-                pacman.speedY = 0
+                pacman.nextDirection = 'right'
                 break
             case "ArrowUp":
-                pacman.start("up")
-                pacman.speedX = 0
-                pacman.speedY = -1
+                pacman.nextDirection = 'up'
                 break
             case "ArrowDown":
-                pacman.start("down")
-                pacman.speedX = 0
-                pacman.speedY = 1
+                pacman.nextDirection = 'down'
                 break
         }
     })
 
+
+    function getWallCollision (obj: DisplayObject) {
+        for (const wall of walls) {
+            if(wall.hasCollision(obj)){
+                return wall
+            }
+        }
+        return null;
+    }
+
+    function changeDirection(obj: Cinematic) {
+        if(obj.nextDirection === 'up') {
+            obj.y -=10
+            if(!getWallCollision(obj)){
+                obj.start('up')
+                obj.speedX = 0;
+                obj.speedY = -1;
+            }
+            obj.y += 10
+        }
+        if(obj.nextDirection === 'right') {
+            pacman.x += 10
+            if(!getWallCollision(obj)){
+                obj.start("right")
+                obj.speedX = 1
+                obj.speedY = 0
+            }
+            pacman.x -= 10
+        }
+        if(obj.nextDirection === 'down') {
+            obj.y +=10
+            if(!getWallCollision(pacman)){
+                obj.start('down')
+                obj.speedX = 0
+                obj.speedY = 1
+            }
+            obj.y -= 10
+        }
+        if(obj.nextDirection === 'left') {
+            obj.x -=10
+            if(!getWallCollision(obj)){
+                obj.start('left')
+                obj.speedX = -1
+                obj.speedY = 0
+            }
+            obj.x += 10
+        }
+    }
 }
 
 export default main;
