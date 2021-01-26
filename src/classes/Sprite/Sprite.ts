@@ -49,18 +49,20 @@ class Sprite extends DisplayObject implements SpriteProps {
     }
 
     draw(context: CanvasRenderingContext2D) {
-        const { x, y, width, height } = this;
-        context.drawImage(
-            this.image,
-            this.frame?.x ?? 0,
-            this.frame?.y ?? 0,
-            this.frame?.width ?? 16,
-            this.frame?.height ?? 16,
-            x,
-            y,
-            width,
-            height
-        )
+        if(this.frame){
+            const { x, y, width, height } = this;
+            context.drawImage(
+                this.image,
+                this.frame?.x ?? 0,
+                this.frame?.y ?? 0,
+                this.frame?.width ?? 16,
+                this.frame?.height ?? 16,
+                x,
+                y,
+                width,
+                height
+            )
+        }
         super.draw(context)
     }
 }

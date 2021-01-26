@@ -1,8 +1,9 @@
 import Game from "@/classes/Game";
 import { loadImage, loadJSON } from "@/utils/loader";
-import Sprite from "@/classes/Sprite";
+import Sprite, {SpriteDirections} from "@/classes/Sprite";
 import Cinematic from "@/classes/Cinematic";
 import DisplayObject from "@/classes/DisplayObject";
+import getRandomFrom from "@/utils/getRandomFrom";
 
 async function main (canvas: HTMLCanvasElement) {
     const debug: boolean = false
@@ -121,6 +122,30 @@ async function main (canvas: HTMLCanvasElement) {
             if(collidedWall){
                 ghost.speedX = 0
                 ghost.speedY = 0
+            }
+            if(ghost.speedX === 0 && ghost.speedY === 0) {
+
+                if(ghost.animation.name === 'up'){
+                    ghost.nextDirection = getRandomFrom<SpriteDirections>('down', 'left', 'right')
+                }
+                if(ghost.animation.name === 'down'){
+                    ghost.nextDirection = getRandomFrom<SpriteDirections>('up', 'left', 'right')
+                }
+                if(ghost.animation.name === 'right'){
+                    ghost.nextDirection = getRandomFrom<SpriteDirections>('up', 'left', 'down')
+                }
+
+                if(ghost.animation.name === 'left'){
+                    ghost.nextDirection = getRandomFrom<SpriteDirections>('up', 'right', 'down')
+                }
+            }
+
+            if(pacman.hasCollision(ghost)){
+                pacman.speedY = 0
+                pacman.speedX = 0
+                pacman.start('die', function (){
+                    // game.stage.remove(this)
+                })
             }
         }
 
