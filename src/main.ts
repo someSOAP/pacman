@@ -107,15 +107,23 @@ async function main (canvas: HTMLCanvasElement) {
         foods = foods.filter(food => !eaten.includes(food))
 
         changeDirection(pacman)
-        // ghosts.forEach(changeDirection)
+        ghosts.forEach(changeDirection)
 
         const collidedWall = getWallCollision(pacman.getNextPosition());
         if(collidedWall){
-            console.log(collidedWall)
             pacman.speedX = 0
             pacman.speedY = 0
             pacman.start(`wait${pacman.animation.name}`)
         }
+
+        for(const ghost of ghosts){
+            const collidedWall = getWallCollision(ghost.getNextPosition());
+            if(collidedWall){
+                ghost.speedX = 0
+                ghost.speedY = 0
+            }
+        }
+
     }
     game.width = maze.width
     game.height = maze.height
