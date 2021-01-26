@@ -110,11 +110,14 @@ async function main (canvas: HTMLCanvasElement) {
         ghosts.forEach(changeDirection)
 
         const collidedWall = getWallCollision(pacman.getNextPosition());
+
         if(collidedWall){
             pacman.speedX = 0
             pacman.speedY = 0
             pacman.start(`wait${pacman.animation.name}`)
         }
+
+        checkTeleport(pacman, canvas)
 
         for(const ghost of ghosts){
             const collidedWall = getWallCollision(ghost.getNextPosition());
@@ -150,6 +153,7 @@ async function main (canvas: HTMLCanvasElement) {
         }
 
     }
+
     game.width = maze.width
     game.height = maze.height
     game.stage.add(maze, pacman, ...foods, ...ghosts, ...walls)
@@ -217,6 +221,21 @@ async function main (canvas: HTMLCanvasElement) {
                 obj.speedY = 0
             }
             obj.x += 10
+        }
+    }
+
+    function checkTeleport(obj: Cinematic, canvas: HTMLCanvasElement) {
+        if(obj.x < 0) {
+            obj.x = canvas.width - obj.width
+        }
+        if(obj.x + obj.width > canvas.width) {
+            obj.x = 0
+        }
+        if(obj.y < 0) {
+            obj.y = canvas.height + obj.height
+        }
+        if(obj.y + obj.width > canvas.height) {
+            obj.y = 0
         }
     }
 }

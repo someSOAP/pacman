@@ -4,6 +4,7 @@ interface GameProps {
     width: number,
     height: number,
     background: string,
+    update?: () => void,
 }
 
 class Game implements GameProps {
@@ -16,6 +17,7 @@ class Game implements GameProps {
 
     background: string
     stage: Group = new Group()
+    update: () => void
 
     constructor(canvas: HTMLCanvasElement, props: GameProps) {
         this.canvas = canvas
@@ -32,10 +34,6 @@ class Game implements GameProps {
 
     clearCanvas () {
         this.context.clearRect(0, 0, this._width, this._height)
-    }
-
-    update() {
-
     }
 
     drawBackground() {

@@ -34,12 +34,6 @@ class Cinematic extends Sprite implements CinematicProps {
         }
     }
 
-    stop() {
-        this.animation = null
-        this.cooldown = 0
-        this.timer = 0
-        this.frameNumber = 0
-    }
 
     update(deltaTime: number) {
         super.update(deltaTime)
