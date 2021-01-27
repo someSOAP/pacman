@@ -10,6 +10,9 @@ async function main (canvas: HTMLCanvasElement) {
     const scale: number = 3
     const spritesWidthHeight: number = 13;
 
+    let ghostsIsBlue: boolean = false;
+
+
     const [image, atlas] = await Promise.all([
         loadImage('/src/sets/spritesheet.png'),
         loadJSON('/src/sets/atlas.json')
@@ -40,6 +43,22 @@ async function main (canvas: HTMLCanvasElement) {
         frame: atlas.maze,
         visible: true
     })
+
+    debugger;
+    let tablets = atlas.position.tablets
+        .map(tablet => new Sprite({
+            image,
+            x: tablet.x * scale,
+            y: tablet.y * scale,
+            width: tablet.width * scale,
+            height: tablet.height * scale,
+            visible: true,
+            speedX: 0,
+            speedY: 0,
+            frame: atlas.tablet,
+            debug,
+        }))
+    debugger
 
     const ghosts = ['red', 'pink', 'turquoise', 'banana']
         .map((color) => {
@@ -72,7 +91,6 @@ async function main (canvas: HTMLCanvasElement) {
         y: wall.y * scale,
         debug
     }))
-    console.log(walls)
 
     let foods = atlas.maze.foods.map(food => {
         return new Sprite({
@@ -143,20 +161,56 @@ async function main (canvas: HTMLCanvasElement) {
             }
 
             if(ghost.hasCollision(pacman)){
-                pacman.speedY = 0
-                pacman.speedX = 0
-                pacman.nextDirection = undefined;
-                pacman.start('die', function (){
-                    game.stage.remove(this)
-                })
+                if(!ghostsIsBlue){
+                    pacman.speedY = 0
+                    pacman.speedX = 0
+                    pacman.nextDirection = undefined;
+                    pacman.start('die', function (){
+                        game.stage.remove(this)
+                    })
+                } else {
+                    ghost.speedX = 0;
+                    ghost.speedY = 0;
+                    game.stage.remove(ghost)
+                }
             }
+
+            for (let i = 0; i < tablets.length; i ++){
+                const tablet = tablets[i]
+
+                if(pacman.hasCollision(tablet)){
+                    tablets.splice(i, 1)
+
+                    game.stage.remove(tablet)
+
+                    ghostsIsBlue = true
+
+                    ghosts.forEach(ghost => {
+                        const defaultAnimations = ghost.animations;
+                        const defaultAnimationName = ghost.animation.name;
+
+                        ghost.animations = atlas.blueGhost
+                        ghost.start(ghost.animation.name)
+                        setTimeout(() => {
+                            ghost.animations = defaultAnimations
+                            ghost.start(ghost.animation.name)
+                            ghostsIsBlue = false;
+                        }, 5000)
+                        ghost.start(ghost.animation.name)
+                    })
+
+
+                    break;
+                }
+            }
+
         }
 
     }
 
     game.width = maze.width
     game.height = maze.height
-    game.stage.add(maze, pacman, ...foods, ...ghosts, ...walls)
+    game.stage.add(maze, pacman, ...foods, ...ghosts, ...walls, ...tablets)
 
     document.addEventListener('keydown', event => {
         switch (event.key) {

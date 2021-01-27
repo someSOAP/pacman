@@ -30,7 +30,7 @@ class DisplayObject implements DisplayObjectProps {
 
     }
 
-    hasCollision(obj: DisplayObject) {
+    hasCollision(obj: DisplayObject): boolean {
         const aPoints = [
             { x: this.x, y: this.y },
             { x: this.x + this.width, y: this.y },
